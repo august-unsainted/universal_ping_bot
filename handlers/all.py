@@ -1,10 +1,12 @@
 from pathlib import Path
 from aiogram import Router, F
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, CallbackQuery
 from orjson import orjson
+from pyrogram.types import InlineKeyboardMarkup
 
-from utils.keyboards import get_keyboard, invent_keyboard
+from utils.keyboards import get_keyboard, start_kb
 from utils.get_members import get_chat_members, get_emoji
 
 router = Router()
@@ -23,9 +25,22 @@ async def deny_action(callback: CallbackQuery) -> bool:
     return res
 
 
+async def handle_edit_message(callback: CallbackQuery, text: str, kb: InlineKeyboardMarkup) -> None:
+    args = {'text': text, 'reply_markup': kb, 'parse_mode': 'HTML'}
+    try:
+        await callback.message.edit_text(**args)
+    except TelegramBadRequest:
+        await callback.message.answer(**args)
+
+
 @router.message(CommandStart())
 async def cmd_start(message: Message):
-    await message.answer(messages.get('start'), reply_markup=invent_keyboard)
+    await message.answer(messages.get('start'), reply_markup=start_kb)
+
+
+@router.callback_query(F.data == 'start')
+async def start_callback(callback: CallbackQuery):
+    await handle_edit_message(callback, messages.get('start'), start_kb)
 
 
 @router.message(Command('all'))
