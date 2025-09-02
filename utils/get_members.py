@@ -1,19 +1,24 @@
 import random
+
+from aiogram.types import Message
+from pyrogram.types import CallbackQuery
 from telethon import TelegramClient
 from config import *
 
 client = TelegramClient('Universal Ping', API_ID, API_HASH)
 
 
-async def get_chat_members(chat_id: str | int):
+async def get_chat_members(callback: CallbackQuery) -> list[str]:
     await client.start(bot_token=TOKEN)
     chat_members = []
-    async for member in client.iter_participants(chat_id):
+    async for member in client.iter_participants(callback.message.chat.id):
         chat_members.append(member.id)
     await client.disconnect()
-    return chat_members
-
-
-def get_emoji(user_id: int) -> str:
-    member_emoji = EMOJI[random.randint(0, len(EMOJI) - 1)]
-    return f'<a href="tg://user?id={user_id}">{member_emoji}</a>'
+    temp_emoji = EMOJI.split()
+    result = []
+    for member in chat_members:
+        if member != int(callback.data.split('_')[-1]):
+            # and not member.lower().endswith('bot')
+            index = random.randint(0, len(temp_emoji) - 1)
+            result.append(f'<a href="tg://user?id={member}">{temp_emoji.pop(index)}</a>')
+    return result
