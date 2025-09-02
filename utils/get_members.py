@@ -1,7 +1,6 @@
 import random
 
-from aiogram.types import Message
-from pyrogram.types import CallbackQuery
+from aiogram.types import CallbackQuery
 from telethon import TelegramClient
 from config import *
 
