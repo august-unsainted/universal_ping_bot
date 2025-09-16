@@ -17,7 +17,7 @@ async def get_chat_members(callback: CallbackQuery) -> list[str]:
     temp_emoji = EMOJI.split()
     result = []
     for member, member_username in chat_members:
-        if member != callback.from_user.id and not member_username.lower().endswith('bot'):
+        if member != callback.from_user.id and member_username and not member_username.lower().endswith('bot'):
             # and not member.lower().endswith('bot')
             index = random.randint(0, len(temp_emoji) - 1)
             result.append(f'<a href="tg://user?id={member}">{temp_emoji.pop(index)}</a>')
