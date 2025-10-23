@@ -8,12 +8,18 @@ from config import *
 client = TelegramClient('Universal Ping', API_ID, API_HASH)
 
 
-async def get_chat_members(callback: CallbackQuery) -> list[str]:
+async def on_startup():
     await client.start(bot_token=TOKEN)
+
+
+async def on_shutdown():
+    await client.disconnect()
+
+
+async def get_chat_members(callback: CallbackQuery) -> list[str]:
     chat_members = []
     async for member in client.iter_participants(callback.message.chat.id):
         chat_members.append((member.id, member.username))
-    await client.disconnect()
     temp_emoji = EMOJI.split()
     result = []
     for member, member_username in chat_members:
